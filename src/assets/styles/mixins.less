@@ -1,0 +1,12 @@
+// 混入
+// less混入就是，申明一段css代码（选择器包裹的代码）或者函数，在其他css选择器调用，可复用包裹的代码。
+
+
+// 鼠标经过上移阴影动画，别处使用 先引入(如果下载了插件提前引入就不用引入)然后 .hoverShadow ()这样就可以
+.hoverShadow () {
+    transition: all .5s;
+    &:hover {
+      transform: translate3d(0,-3px,0);
+      box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+    }
+  }
