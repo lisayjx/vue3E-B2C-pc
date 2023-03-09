@@ -1,7 +1,7 @@
 // 首页相关API
 import request from '@/utils/request'
 /**
- * 获取品牌推荐（左侧导航最下面的推荐数据）
+ * 获取品牌推荐（左侧导航最下面的推荐数据,还有内容里的获取热门品牌）
  * @param {Integer} limit - 品牌个数
  * @return Promise
  */
@@ -30,4 +30,18 @@ export const getNew = () => {
  */
 export const getHot = () => {
   return request('home/hot', 'get')
+}
+/**
+ * 获取 商品区块 数据
+ * @return Promise
+ */
+export const getGoods = () => {
+  return request('home/goods', 'get')
+}
+/**
+ * 获取 最新专题 数据
+ * @return Promise
+ */
+export const getSpecial = () => {
+  return request('home/special', 'get')
 }
