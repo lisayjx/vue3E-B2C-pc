@@ -11,7 +11,8 @@
             <slot />
         </span>
        <!-- 箭头 -->
-        <i class="iconfont icon-angle-right"></i>
+        <!-- <i class="iconfont icon-angle-right"></i> -->
+
     </div>
 </template>
 <script>

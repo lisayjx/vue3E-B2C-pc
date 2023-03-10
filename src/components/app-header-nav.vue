@@ -6,10 +6,13 @@
 
       <li v-for="item in list"
       :key="item.id"
-      @mouseenter="show(item)"
+      @mousemove="show(item)"
       @mouseleave="hide(item)">
       <router-link :to="`/category/${item.id}`" @click="hide(item)">{{ item.name}}</router-link>
-        <div class="layer" :class="{open:item.open}">
+                 <!-- 弹窗 -->
+          <!-- 因为我们此时点击弹窗后页面会自己网上滚动，导致我们鼠标落在一级分类上，然后导致触发弹窗
+              但是此时我们的鼠标没有动，所以我们修改触发弹窗的条件，就是，当鼠标移动过才触发弹窗 -->
+      <div class="layer" :class="{open:item.open}">
           <ul>
             <li v-for="sub in item.children" :key="sub.id" >
                 <router-link :to="`/category/sub/${sub.id}`"  @click="hide(item)">

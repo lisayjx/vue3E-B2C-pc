@@ -2,23 +2,38 @@
 // 这就是插件
 // vue2.0插件写法要素：导出一个对象，有install函数，默认传入了Vue构造函数，Vue基础之上扩展
 // vue3.0插件写法要素：导出一个对象，有install函数，默认传入了app应用实例，app基础之上扩展
-import B2cSkeleton from './b2c-skeleton'
-import B2cCarousel from './b2c-carousel'
-import B2cMore from './b2c-more'
-import B2cBread from './b2c-bread'
-import B2cBreadItem from './b2c-bread-item'
+// import B2cSkeleton from './b2c-skeleton'//骨架屏
+// import B2cCarousel from './b2c-carousel'//轮播图
+// import B2cMore from './b2c-more'//查看更多小组件
+// import B2cBread from './b2c-bread'//面包屑组件
+// import B2cBreadItem from './b2c-bread-item'//单项面包屑组件
 import defaultImg from '@/assets/images/false.png' // 引入默认图片
+// 导入library文件夹下的所有组件
+// 批量导入需要使用一个函数 require.context(dir,deep,matching)
+// 参数：1. 目录  2. 是否加载子目录  3. 加载的正则匹配
+//   ./表示当前目录，不加载子目录，找到以vue结尾的
+const importFn = require.context('./', false, /\.vue$/)// importFn已经装着所有符合条件的组件
 
 export default {
   install (app) {
     // 在app上进行扩展，app提供 component directive 函数
     // 如果要挂载原型 app.config.globalProperties 方式
-    app.component(B2cSkeleton.name, B2cSkeleton)// 骨架屏
-    app.component(B2cCarousel.name, B2cCarousel)// 轮播图
-    app.component(B2cMore.name, B2cMore) // 查看更多小组件
-    app.component(B2cBread.name, B2cBread) // 面包屑组件
-    app.component(B2cBreadItem.name, B2cBreadItem) // 单项面包屑组件
-    defineDirective(app)// 自定义指令
+    // app.component(B2cSkeleton.name, B2cSkeleton)// 骨架屏
+    // app.component(B2cCarousel.name, B2cCarousel)// 轮播图
+    // app.component(B2cMore.name, B2cMore) // 查看更多小组件
+    // app.component(B2cBread.name, B2cBread) // 面包屑组件
+    // app.component(B2cBreadItem.name, B2cBreadItem) // 单项面包屑组件
+
+    // 批量注册全局组件
+    // importFn.keys() //装着组件地址的数组
+    importFn.keys().forEach(path => {
+      // 默认导入组件
+      const component = importFn(path).default
+      // 注册组件
+      app.component(component.name, component)
+    })
+    // ----------------------------------------
+    defineDirective(app)// 自定义全局指令
   }
 }
 
