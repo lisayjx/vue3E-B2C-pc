@@ -24,7 +24,7 @@ export default {
     const dynamicsItems = []// 装拼凑好的，首页>电器>空调
     items.forEach((item, index) => {
       dynamicsItems.push(item)
-      if (index !== 0 && index < items.length - 1) { // 最后一个没有右侧箭头
+      if (index < items.length - 1) { // 最后一个没有右侧箭头
         dynamicsItems.push(h('i', { class: 'iconfont icon-angle-right' }))// 箭头
       }
     })

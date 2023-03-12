@@ -7,7 +7,7 @@
 // import B2cMore from './b2c-more'//查看更多小组件
 // import B2cBread from './b2c-bread'//面包屑组件
 // import B2cBreadItem from './b2c-bread-item'//单项面包屑组件
-import defaultImg from '@/assets/images/false.png' // 引入默认图片
+import defaultImg from '@/assets/images/200.png' // 引入默认图片
 // 导入library文件夹下的所有组件
 // 批量导入需要使用一个函数 require.context(dir,deep,matching)
 // 参数：1. 目录  2. 是否加载子目录  3. 加载的正则匹配
