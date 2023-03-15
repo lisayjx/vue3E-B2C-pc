@@ -52,6 +52,9 @@
 </template>
 
 <script>
+// 左侧的数据，第一个词是一级分类，后面的是二级分类
+// 最后得品牌 品牌推荐 是我们自己创造得一行,然后需要单独获取他的数据
+// 鼠标滑过 显示的弹窗得数据在vuex里得category得state里的list.goods里
 import { useStore } from 'vuex'
 import { computed, reactive, ref } from 'vue'
 import { getBrand } from '@/api/home'
@@ -69,14 +72,14 @@ export default {
       id: 'brand',
       name: '品牌',
       children: [{ id: 'brand-children', name: '品牌推荐' }],
-      brands: []// 品牌列表
+      brands: []// 弹窗里得品牌列表
     })
     const menuList = computed(() => {
       const list = store.state.category.list.map((item) => {
         return {
           id: item.id,
           name: item.name,
-          children: item.children && item.children.slice(0, 2), //   防止初始化没有children的时候调用slice函数报错
+          children: item.children && item.children.slice(0, 2), // 二级分类   防止初始化没有children的时候调用slice函数报错,前面真就显示后面得,前面假后面也没有
           goods: item.goods
         }
       })
@@ -84,13 +87,13 @@ export default {
       return list
     })
     // console.log(menuList.value)
-    // ---------------------------得到右侧出现弹窗的数据
+    // ---------------------------得到右侧出现弹窗的数据,数据在currentCategory.goods
     const currentCategoryId = ref(null) // 定义一个当前鼠标滑过的左侧导航一级分类那项的id
     const currentCategory = computed(() => {
       return menuList.value.find(item => item.id === currentCategoryId.value)
     })
 
-    // 品牌需要单独获取数据
+    // ---------- 品牌需要单独获取数据
     getBrand(6).then(res => {
       brand.brands = res.result
     })

@@ -15,7 +15,7 @@ export const useLazyData = (target, apiFn) => {
   const result = ref([])
   const { stop } = useIntersectionObserver(
     target, // 参数一
-    ([{ isIntersecting }], observerElement) => { // 参数二
+    ([{ isIntersecting }], dom) => { // 参数二
       // 在此处可根据isIntersecting来判断，然后做业务
       if (isIntersecting) { // 如果进入了可视区，停止观察，因为不能一直触发
         stop()

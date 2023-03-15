@@ -7,7 +7,7 @@
   <app-header-sticky></app-header-sticky>
 
   <main class="app-body">
-    <!-- 二级路由 -->
+    <!-- 二级路由出口（除了顶部底部，变化的那部分得出口） -->
     <router-view></router-view>
   </main>
  <!-- 底部 -->

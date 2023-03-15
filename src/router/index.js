@@ -3,8 +3,9 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 // 懒加载引入路由
 import Layout from '@/views/Layout'
 import Home from '@/views/home'
-import TopCategory from '@/views/category'
-import SubCategory from '@/views/category/sub'
+const TopCategory = () => import('@/views/category')
+const SubCategory = () => import('@/views/category/sub')
+const Goods = () => import('@/views/goods/index')
 
 // 路由规则
 const routes = [
@@ -23,6 +24,10 @@ const routes = [
       {
         path: '/category/sub/:id',
         component: SubCategory // 二级分类页面（点击二级导航进入的页面）
+      },
+      {
+        path: '/product/:id', // 商品详情页
+        component: Goods
       }
     ]
   }

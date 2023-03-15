@@ -9,7 +9,7 @@ export default createStore({
   state: {
   },
   getters: {
-    categoryList: state => state.category.list // nav分类列表
+    categoryList: state => state.category.list // nav分类列表，首页，jujia，美食..
   },
   mutations: {
   },

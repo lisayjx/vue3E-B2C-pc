@@ -45,7 +45,6 @@ export default {
     const currIndex = ref(0) // 当前索引 默认值0
 
     // 1.自动轮播
-    // eslint-disable-next-line no-unused-vars
     let timer = null
     const autoPlayFn = () => {
       // 隔3s自动播放

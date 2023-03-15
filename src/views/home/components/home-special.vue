@@ -36,7 +36,6 @@ export default {
   setup () {
     const target = ref(null)
     let list = ref([])
-    console.log(list)
     const result = useLazyData(target, getSpecial)
     list = result
     return { list, target }

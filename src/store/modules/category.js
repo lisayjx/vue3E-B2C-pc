@@ -28,7 +28,7 @@ export default {
     }
   },
   actions: {
-    // 请求接口
+    // 请求接口，获取顶级分类数据
     async getCategoryList (context) {
       const { result } = await findAllCategory()
       // 给一级分类加上一个控制二级分类显示隐藏的数据open

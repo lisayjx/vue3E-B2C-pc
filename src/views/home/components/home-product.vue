@@ -1,4 +1,5 @@
 <template>
+  <!-- 居家..顶级分类数据 -->
     <div class="home-product"  ref="target">
       <HomePanel :title="cate.name" v-for="cate in result" :key="cate.id">
         <template v-slot:right>
@@ -6,7 +7,7 @@
             <RouterLink v-for="sub in cate.children" :key="sub.id" to="/">{{ sub.name }}</RouterLink>
           </div>
           <!-- 查看更多 -->
-          <XtxMore />
+          <b2c-more />
         </template>
         <div class="box">
           <RouterLink class="cover" to="/">

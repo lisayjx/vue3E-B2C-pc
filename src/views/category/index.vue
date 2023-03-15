@@ -47,6 +47,7 @@
 </template>
 
 <script>
+// 顶级类目页： 和首页（home）平级得顶级类目页 负责，1.点击顶级类目，拿到顶级类目下得数据
 import { getBanner } from '@/api/home'
 import { useStore } from 'vuex'
 import { useRoute } from 'vue-router'
@@ -66,16 +67,14 @@ export default {
     // route.params.id拿到上一页页面点击然后传过来的id
     const store = useStore()
     const route = useRoute()
-    const topCategory = computed(() => {
+    const topCategory = computed(() => { // 当前点击那项分类，比如居家，美食
       let cate = {}
-      const item = store.state.category.list.find(
-        (item) => item.id === route.params.id
-      )
+      const item = store.state.category.list.find(item => item.id === route.params.id)
       if (item) cate = item
       return cate
     })
-    // 拿到每个顶级类目数据，就是点击居家或者美食..出现的数据
-    const subList = ref([])
+    // 拿到每个顶级类目得数据，就是点击居家或者美食..出现的数据
+    const subList = ref([])// 各个点击顶级分类后，顶级分类下得数据
     const getSubList = () => {
       getTopCategory(route.params.id).then((res) => {
         subList.value = res.result.children

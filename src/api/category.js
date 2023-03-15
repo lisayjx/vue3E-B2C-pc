@@ -24,3 +24,13 @@ export const getTopCategory = (id) => {
 export const getSubCategoryFilter = (id) => {
   return request('/category/sub/filter', 'get', { id })
 }
+/**
+ * 二级类目-筛选条件-获取分类下的商品（带筛选条件）
+ * 商品列表_临时
+ * @returns Promise
+ * @params {object}-参考文档
+ * 未提交排序字段（sortField）则视为综合排序
+ */
+export const getSubCategoryGoods = (params) => {
+  return request('/category/goods/temporary', 'POST', params)
+}

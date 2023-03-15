@@ -12,8 +12,8 @@
         </a>
       </div>
       <div class="check">
-        <b2c-checkbox v-model="sortParams.inventory">仅显示有货商品</b2c-checkbox>
-        <b2c-checkbox v-model="sortParams.onlyDiscount">仅显示特惠商品</b2c-checkbox>
+        <b2c-checkbox @change="changeCheck" v-model="sortParams.inventory">仅显示有货商品</b2c-checkbox>
+        <b2c-checkbox @change="changeCheck" v-model="sortParams.onlyDiscount">仅显示特惠商品</b2c-checkbox>
       </div>
     </div>
   </template>
@@ -22,7 +22,7 @@ import { reactive } from 'vue'
 
 export default {
   name: 'SubSort',
-  setup () {
+  setup (props, { emit }) {
     // 实现交互（和后台一致）
   //  1.明确交互数据
     const sortParams = reactive({
@@ -48,9 +48,16 @@ export default {
         sortParams.sortField = sortField
         sortParams.sortMethod = null // 默认排序
       }
+      // 通知父亲  触发sort-change事件,把排序数据给父亲
+      emit('sort-change', sortParams)
     }
 
-    return { sortParams, changeSort }
+    // 点击复选框
+    const changeCheck = () => {
+      // 通知父亲  触发sort-change事件,把排序数据给父亲
+      emit('sort-change', sortParams)
+    }
+    return { sortParams, changeSort, changeCheck }
   }
 }
 </script>
