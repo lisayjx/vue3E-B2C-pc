@@ -14,9 +14,16 @@
           <div class="media">
             <!-- 图片组件 -->
             <goods-image :images="goods.mainPictures"/>
+            <!-- 商品销售情况组件 -->
+            <goods-sales/>
           </div>
           <!-- 右 -->
-        <div class="spec"></div>
+        <div class="spec">
+          <!-- 商品名字组件 -->
+          <goods-name  :goods="goods"/>
+          <!-- 商品规格SKU -->
+          <goods-sku :goods="goods"/>
+        </div>
         </div>
         <!-- 商品推荐组件 为了每次切换商品都重新渲染所以加if-->
         <goods-relevant/>
@@ -41,10 +48,13 @@ import GoodsRelevant from './components/goods-relevant'
 import { getGoods } from '@/api/product'
 import { useRoute } from 'vue-router'
 import GoodsImage from './components/goods-image.vue'
+import GoodsSales from './components/goods-sales.vue'
+import GoodsName from './components/goods-name.vue'
+import GoodsSku from './components/goods-sku.vue'
 
 export default {
   name: 'B2cGoodsPage',
-  components: { GoodsRelevant, GoodsImage },
+  components: { GoodsRelevant, GoodsImage, GoodsSales, GoodsName, GoodsSku },
   setup () {
     const goods = handleGetGoods()
     return { goods }
@@ -65,7 +75,6 @@ const handleGetGoods = () => {
         nextTick(() => {
           goods.value = res.result
         })
-        console.log(res.result)
       })
     }
   }, { immediate: true })
