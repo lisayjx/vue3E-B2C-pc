@@ -22,7 +22,7 @@
           <!-- 商品名字组件 -->
           <goods-name  :goods="goods"/>
           <!-- 商品规格SKU -->
-          <goods-sku :goods="goods"/>
+          <goods-sku :goods="goods" skuId="1369155863389933570" @change="changeSku"/>
         </div>
         </div>
         <!-- 商品推荐组件 为了每次切换商品都重新渲染所以加if-->
@@ -56,8 +56,19 @@ export default {
   name: 'B2cGoodsPage',
   components: { GoodsRelevant, GoodsImage, GoodsSales, GoodsName, GoodsSku },
   setup () {
+    // 1.获取商品信息
     const goods = handleGetGoods()
-    return { goods }
+    // 2.得到子组件goods-sku传来的规格信息,每次我们点击规格都会变化
+    const changeSku = (sku) => {
+      // console.log(sku)// 如果规格选择不完整就是个{},完整的话就是包括原价现价库存规格属性的对象
+      // 修改商品的原价,现价,库存,不同规格不同价格
+      if (sku.skuId) {
+        goods.value.price = sku.price
+        goods.value.oldPrice = sku.oldPrice
+        goods.value.inventory = sku.inventory
+      }
+    }
+    return { goods, changeSku }
   }
 
 }
@@ -80,6 +91,7 @@ const handleGetGoods = () => {
   }, { immediate: true })
   return goods
 }
+
 </script>
 
   <style scoped lang='less'>
