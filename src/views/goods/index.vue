@@ -23,27 +23,37 @@
           <goods-name  :goods="goods"/>
           <!-- 商品规格SKU -->
           <goods-sku :goods="goods" skuId="1369155863389933570" @change="changeSku"/>
+        <!-- 商品数量 组件 -->
+        <b2c-numbox label="数量" v-model="num" :max="goods.inventory"></b2c-numbox>
+        <!-- 按钮组件 -->
+        <b2c-button type="primary" style="margin-top: 20px;">加入购物车</b2c-button>
         </div>
         </div>
-        <!-- 商品推荐组件 为了每次切换商品都重新渲染所以加if-->
-        <goods-relevant/>
+        <!-- 商品推荐组件 -->
+         <!-- 商品推荐 -->
+      <GoodsRelevant :goodsId="goods.id"/>
         <!-- 商品详情 -->
         <div class="goods-footer">
           <div class="goods-article">
             <!-- 商品+评价 -->
-            <div class="goods-tabs"></div>
+          <goods-tabs />
             <!-- 注意事项 -->
-            <div class="goods-warn"></div>
+            <div class="goods-warn">
+              <GoodsWarn/>
+            </div>
           </div>
-          <!-- 24热榜+专题推荐 -->
-          <div class="goods-aside"></div>
+          <!-- 24热榜+周热榜 -->
+          <div class="goods-aside">
+            <goods-hot :goodsId="goods.id" :type="1"/>
+            <goods-hot :goodsId="goods.id" :type="2"/>
+          </div>
         </div>
       </div>
     </div>
   </template>
 
 <script>
-import { nextTick, ref, watch } from 'vue'
+import { nextTick, ref, watch, provide } from 'vue'
 import GoodsRelevant from './components/goods-relevant'
 import { getGoods } from '@/api/product'
 import { useRoute } from 'vue-router'
@@ -51,10 +61,12 @@ import GoodsImage from './components/goods-image.vue'
 import GoodsSales from './components/goods-sales.vue'
 import GoodsName from './components/goods-name.vue'
 import GoodsSku from './components/goods-sku.vue'
-
+import GoodsTabs from './components/goods-tabs.vue'
+import GoodsHot from './components/goods-hot'
+import GoodsWarn from './components/goods-warn'
 export default {
   name: 'B2cGoodsPage',
-  components: { GoodsRelevant, GoodsImage, GoodsSales, GoodsName, GoodsSku },
+  components: { GoodsRelevant, GoodsImage, GoodsSales, GoodsName, GoodsSku, GoodsTabs, GoodsHot, GoodsWarn },
   setup () {
     // 1.获取商品信息
     const goods = handleGetGoods()
@@ -68,7 +80,12 @@ export default {
         goods.value.inventory = sku.inventory
       }
     }
-    return { goods, changeSku }
+    // 提供goodsList给后代使用
+    provide('goods', goods)
+
+    // 选择的数量 组件
+    const num = ref(1)
+    return { goods, changeSku, num }
   }
 
 }
