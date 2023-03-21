@@ -41,6 +41,8 @@
             <span class="attr">{{ formatSpecs(item.orderInfo.specs) }}</span>
           </div>
           <div class="text">{{ item.content}}</div>
+          <!-- 图片预览组件 -->
+          <goods-comment-image :pictures="item.pictures"/>
           <div class="time">
             <span>{{ item.createTime}}</span>
             <span class="zan"><i class="iconfont icon-dianzan"></i>{{ item.praiseCount}}</span>
@@ -48,14 +50,22 @@
         </div>
       </div>
     </div>
+    <!-- 分页 -->
+    <B2cPagination
+    v-if="total"
+    @CurrentChange="updateCurrPage"
+    :total="total" :currentPage="reqParams.page"
+    :pageSize="reqParams.pageSize"/>
   </div>
 </template>
 <script>
 import { ref, inject, reactive, watch } from 'vue'
 import { findCommentInfoByGoods, findCommentList } from '@/api/product'
+import GoodsCommentImage from './goods-comment-image.vue'
 
 export default {
   name: 'GoodsComment',
+  components: { GoodsCommentImage },
   setup () {
     // 评价信息
     const goods = inject('goods')
@@ -65,7 +75,7 @@ export default {
       res.result.tags.unshift({ title: '有图', tagCount: res.result.hasPictureCount, type: 'img' })
       res.result.tags.unshift({ title: '全部评价', tagCount: res.result.evaluateCount, type: 'all' })
       commentInfo.value = res.result
-      console.log(res.result)
+      // console.log(res.result)
     })
 
     // 当前点击的tag,激活tag
@@ -89,6 +99,7 @@ export default {
       }
 
       // console.log(reqParams)
+      reqParams.page = 1
     }
     // 点击排序
     const changeSort = (sortField) => {
@@ -106,24 +117,29 @@ export default {
     })
     //  监听筛选条件,只要变化就重新发起请求
     const commentList = ref([])// 评论列表数据
-    watch(reqParams, () => {
+    const total = ref(0)// 评论总条数
+    watch(reqParams, async () => {
       // 发请求
-      findCommentList(goods.id, reqParams).then(res => {
-        commentList.value = res.result.items
-        console.log(res.result.items)
-      })
-    }, { immediate: true, deep: true })
+      const res = await findCommentList(goods.id, reqParams)
+      commentList.value = res.result.items
+      //  为了分页 的 总评论条数
+      total.value = res.result.counts
+    }, { immediate: true })
     // 定义转换规格信息的函数
     const formatSpecs = (specs) => {
-      console.log(specs)
-      return specs.reduce((p, c) => `${p} ${c.name}：${c.nameValue}`, '').trim()
+      // console.log(specs)
+      return specs.reduce((p, c) => `${p} ${c.name}:${c.nameValue}`, '').trim()
     }
 
     // 定义转换用户名的函数
     const formatNickname = (nickname) => {
       return nickname.substr(0, 1) + '****' + nickname.substr(-1)
     }
-    return { commentInfo, currentTagIndex, changeTag, reqParams, commentList, changeSort, formatSpecs, formatNickname }
+    // 监听分页组件传来的 current-change 更新最新页码,修改reqParams.page
+    const updateCurrPage = (currentPage) => {
+      reqParams.page = currentPage
+    }
+    return { commentInfo, currentTagIndex, changeTag, reqParams, commentList, changeSort, formatSpecs, formatNickname, updateCurrPage }
   }
 }
 </script>

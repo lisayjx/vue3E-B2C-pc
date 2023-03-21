@@ -28,10 +28,11 @@ export default {
   name: 'GoodsTabs',
   components: { goodsDetail, goodsComment },
   setup () {
-    // activeName控制谁被激活 detail-->详情   comment-->评价
+    // activeName控制谁被激活 goodsDetail-->详情   goodsComment-->评价
     const activeName = ref('goodsDetail')
     // 收到祖先注入的goods
     const goods = inject('goods')
+    console.log(goods)
     return { activeName, goods }
   }
 
