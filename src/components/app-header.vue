@@ -41,7 +41,9 @@ export default {
         height: 132px;
         width: 100%;
         text-indent: -9999px;//隐藏网站名字，写网站名为了SEO
-        background: url(../assets/images/logo.png) no-repeat center 18px / contain;
+        // background: url(../assets/images/logo.png) no-repeat center 18px / contain;
+        background: url(../assets/images/logo.png) no-repeat  center -30px;
+        background-size: 320px 220px;
       }
     }
 

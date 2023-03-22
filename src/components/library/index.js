@@ -7,13 +7,14 @@
 // import B2cMore from './b2c-more'//查看更多小组件
 // import B2cBread from './b2c-bread'//面包屑组件
 // import B2cBreadItem from './b2c-bread-item'//单项面包屑组件
-import defaultImg from '@/assets/images/200.png' // 引入默认图片
+import defaultImg from '@/assets/images/200.png'// 引入默认图片
+
+import Message from './Message' // 引入消息提示信息
 // 导入library文件夹下的所有组件
 // 批量导入需要使用一个函数 require.context(dir,deep,matching)
 // 参数：1. 目录  2. 是否加载子目录  3. 加载的正则匹配
 //   ./表示当前目录，不加载子目录，找到以vue结尾的
 const importFn = require.context('./', false, /\.vue$/)// importFn已经装着所有符合条件的组件
-
 export default {
   install (app) {
     // 在app上进行扩展，app提供 component directive 函数
@@ -34,6 +35,8 @@ export default {
     })
     // ----------------------------------------
     defineDirective(app)// 自定义全局指令
+    // 如果你想挂载全局的属性，能够通过组件实例调用的属性   this.$message
+    app.config.globalProperties.$message = Message// 原型函数
   }
 }
 
