@@ -29,7 +29,8 @@ import { ref } from 'vue'
 import LoginHeader from './components/login-header'
 import LoginFooter from './components/login-footer'
 import LoginForm from './components/login-form'
-
+import { useStore } from 'vuex'
+import { useRoute } from 'vue-router'
 export default {
   name: 'LoginPage',
   components: {
@@ -40,6 +41,11 @@ export default {
   setup () {
     // 控制是 表单还是扫码
     const activeName = ref('account')
+
+    // 存储登陆后回跳地址
+    const store = useStore()
+    const route = useRoute()
+    store.commit('user/setRedirectUrl', route.query.redirectUrl || '/')
 
     return { activeName }
   }

@@ -8,7 +8,7 @@
                     <li>
                         <a href="javascript:;"><i class="iconfont icon-user"></i>{{ profile.account  }}</a>
                     </li>
-                    <li><a href="javascript:;">退出登录</a></li>
+                    <li><a @click="logout" href="javascript:;">退出登录</a></li>
                 </template>
                 <!-- 未登录 -->
                 <template v-else>
@@ -30,14 +30,22 @@
 <script>
 import { computed } from 'vue'
 import { useStore } from 'vuex'
+import { useRouter } from 'vue-router'
 export default {
   setup () {
     const store = useStore()
+    const router = useRouter()
     // 使用vuex中的state需要设置计算属性
     const profile = computed(() => {
       return store.state.user.profile
     })
-    return { profile }
+
+    // 退出登录1.清空vuex和本次存储2.跳转
+    const logout = () => {
+      store.commit('user/setUser', {})
+      router.push('/login')
+    }
+    return { profile, logout }
   }
 }
 </script>

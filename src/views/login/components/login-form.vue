@@ -43,7 +43,9 @@
                     <div class="input">
                         <i class="iconfont icon-code"></i>
                         <Field v-model="form.code" type="password" placeholder="请输入验证码" name="code" />
-                        <span class="code">发送验证码</span>
+                        <span @click="send()" class="code">
+                           {{time===0?'发送验证码':`${time}秒后发送`}}
+                        </span>
                     </div>
                        <!-- 错误提示 -->
                        <div v-if="errors.code" class="error"><i class="iconfont icon-warning" />{{ errors.code }}</div>
@@ -64,7 +66,13 @@
             <a @click="login()" href="javascript:;" class="btn">登录</a>
         </Form>
         <div class="action">
-            <img src="https://qzonestyle.gtimg.cn/qzone/vas/opensns/res/img/Connect_logo_7.png" alt="" />
+            <!-- qq登录按钮 -->
+            <!-- <span id="qqLoginBtn"></span> -->
+            <!-- <img src="https://qzonestyle.gtimg.cn/qzone/vas/opensns/res/img/Connect_logo_7.png" alt="" /> -->
+            <!-- 这个地址 注意项目启动的端口号 -->
+            <a href="https://graph.qq.com/oauth2.0/authorize?client_id=100556005&response_type=token&scope=all&redirect_uri=http%3A%2F%2Fwww.corho.com%3A8080%2F%23%2Flogin%2Fcallback">
+            <img src="https://qzonestyle.gtimg.cn/qzone/vas/opensns/res/img/Connect_logo_7.png" alt="">
+          </a>
             <div class="url">
                 <a href="javascript:;">忘记密码</a>
                 <a href="javascript:;">免费注册</a>
@@ -82,7 +90,11 @@ import { Form, Field } from 'vee-validate'
 import schema from '@/utils/vee-validate-schema'
 // 引入消息提示函数
 import Message from '@/components/library/Message'
-
+import { userAccountLogin, userMobileLoginMsg, userMobileLogin } from '@/api/user'
+import { useStore } from 'vuex'
+import { useRoute, useRouter } from 'vue-router'
+import { useIntervalFn } from '@vueuse/core'// 定时器
+// import QC from 'qc' // 导入qq提供的全局方法
 export default {
   name: 'LoginForm',
   components: { Form, Field },
@@ -131,21 +143,93 @@ export default {
     })
     // 点击登录
     // const { proxy } = getCurrentInstance() // 获取当前组件实例proxy，proxy是从应用实例app上解构出来的
+    const store = useStore()
+    const route = useRoute()
+    const router = useRouter()
     const login = async () => {
       // 对表单整体校验，validate函数
       // Form组件提供了一个 validate_函数作为整体表单校验，当是返回的是一个promise1
 
       const valid = await target.value.validate()// 等校验通过做操作
-      console.log(valid)
       // 可以进行登录请求
       //   vue3.0组合式api用 引入Message（{}）
-      Message({ type: 'error', text: 'error' })
       //   不用选项式api怎么调原型上的方法？setup中怎么调用原型上的方法？
-    //   proxy.$message({ type: 'error', text: 'error!!!!!!!!!!!!!!!!!!!!!' })
+      //   proxy.$message({ type: 'error', text: 'error!!!!!!!!!!!!!!!!!!!!!' })
+      if (valid) {
+        try {
+          let res = null// 装得到的结果
+          // 账号密码登录 zhousg 123456
+          if (!isMsgLogin.value) {
+            const { account, password } = form
+            res = await userAccountLogin({ account, password })
+          } else {
+          // 手机号登陆
+          // 1.发送验证码
+          // 1.1绑定发送验证码按钮点击事件
+          // 1.2校验手机号，如果成功发送短信（api），开始60s倒计时，不能再次点击，倒计时结束回复原样
+            //   1.3手机号校验失败，显示校验结果
+          // 2.手机号登陆（api，存储信息，提示成功，跳转页）
+            const { mobile, code } = form
+            res = await userMobileLogin({ mobile, code })
+          }
+          const { id, account, nickname, avatar, token, mobile } = res.result
+          // 1.存储信息
+          store.commit('user/setUser', { id, account, nickname, avatar, token, mobile })
+          // // 2.提示
+          Message({ type: 'success', text: '登录成功' })
+          // // 3.跳转
+          router.push(route.query.redirectUrl || '/')
+        } catch (error) {
+          if (error) {
+            Message({ type: 'error', text: error.response.data.message || '登陆失败' })
+          }
+        }
+      }
     }
+    // 点击发送验证码
+    // 1.发送验证码
+    // 1.1绑定发送验证码按钮点击事件
+    // 1.2校验手机号，如果成功发送短信（api），开始60s倒计时，不能再次点击，倒计时结束回复原样
+    //   1.3手机号校验失败，显示校验结果
+
+    // pause暂停 resume开始
+    // useIntervalFn（回调函数，执行间隔，是否立即开启）
+    const time = ref(0)
+    const { pause, resume } = useIntervalFn(() => {
+      time.value--
+      if (time.value <= 0) {
+        pause()
+      }
+    }, 1000, false)
+    const send = async () => {
+      // 校验手机号  13666666666
+      const valid = mySchema.mobile(form.mobile)
+      if (valid === true) { // 校验成功并且没有在倒计时
+        if (time.value === 0) {
+          // 请求验证码接口
+          await userMobileLoginMsg(form.mobile).then(res => {
+            console.log(res.result)
+          })
+          Message({ type: 'success', text: '验证码发送成功' })
+          // 定时器开启
+          time.value = 60
+          resume()
+        }
+      } else { // 校验失败，使用vee的错误函数显示信息setFieldError(字段名，错误信息)设置字段错误
+        target.value.setFieldError('mobile', valid)
+      }
+    }
+    // 初始化qq登录按钮（看官方）得到跳转地址而已
+    // 她会弹出新的窗口，我们审查元素找到这个地址，让她不弹出来，我们自己写元素
+    // onMounted(() => {
+    //   // 组件渲染完毕，使用QC生成QQ登录按钮
+    //   QC.Login({
+    //     btnId: 'qqLoginBtn'
+    //   })
+    // })
 
     return {
-      isMsgLogin, form, mySchema, target, login
+      isMsgLogin, form, mySchema, target, login, send, time
 
     }
   }
