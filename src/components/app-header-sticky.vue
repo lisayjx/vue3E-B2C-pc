@@ -62,8 +62,10 @@ export default {
     .logo {
       width: 200px;
       height: 80px;
-      background: url(../assets/images/logo.png) no-repeat  right 2px;
-      background-size: 160px auto;
+      // background: url(../assets/images/logo.png) no-repeat  right 2px;
+      // background-size: 160px auto;
+      background: url(../assets/images/logo.png) no-repeat  center ;
+        background-size: 320px 220px;
     }
     .right {
       width: 220px;

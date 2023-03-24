@@ -9,21 +9,18 @@
           <i class="iconfont icon-search"></i>
           <input type="text" placeholder="搜一搜">
         </div>
-        <!-- 购物车 -->
-        <div class="cart">
-          <a class="curr" href="#">
-            <i class="iconfont icon-cart"></i><em>2</em>
-          </a>
-        </div>
+        <!-- 购物车图标和弹窗 -->
+        <AppHeaderCart />
       </div>
     </header>
   </template>
 
 <script>
 import AppHeaderNav from '@/components/app-header-nav.vue'
+import AppHeaderCart from './app-header-cart'
 export default {
   name: 'AppHeader',
-  components: { AppHeaderNav }
+  components: { AppHeaderNav, AppHeaderCart }
 }
 </script>
 

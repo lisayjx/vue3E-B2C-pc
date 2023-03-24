@@ -44,3 +44,11 @@ export const findCommentInfoByGoods = (id) => {
 export const findCommentList = (id, params) => {
   return request(`https://mock.boxuegu.com/mock/1175/goods/${id}/evaluate/page`, 'get', params)
 }
+
+/**
+ * 商品信息-库存价格是否有效（支持本地购物车）每次只能请求到一个商品
+ * @param {String} id -路径里的- SKU_ID
+ */
+export const getValidGoods = (id) => {
+  return request(`/goods/stock/${id}`, 'get')
+}

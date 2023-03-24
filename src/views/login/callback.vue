@@ -17,61 +17,64 @@
         </a>
       </nav>
       <div class="tab-content" v-if="hasAccount">
-        <CallbackBind :nickname="nickname" :avatar="avatar" />
+        <CallbackBind :unionId="unionId"  />
       </div>
-      <div class="tab-content" v-else>
-        <CallbackPatch />
+      <div class="tab-content"  v-else>
+        <CallbackPatch :unionId="unionId"/>
       </div>
     </section>
     <LoginFooter />
   </template>
 
 <script>
-// import QC from 'qc'
+import QC from 'qc'
 import { ref } from 'vue'
 import LoginHeader from './components/login-header'
 import LoginFooter from './components/login-footer'
 import CallbackBind from './components/callback-bind'
 import CallbackPatch from './components/callback-patch'
-// import { userQQLogin } from '@/api/user'
-// import Message from '@/components/library/Message'
-// import { useStore } from 'vuex'
-// import { useRouter } from 'vue-router'
+import { userQQLogin } from '@/api/user'
+import Message from '@/components/library/Message'
+import { useStore } from 'vuex'
+import { useRouter } from 'vue-router'
 export default {
   name: 'PageCallback',
   components: { LoginHeader, LoginFooter, CallbackBind, CallbackPatch },
   setup () {
-    // const store = useStore()
-    // const router = useRouter()
+    const store = useStore()
+    const router = useRouter()
     const hasAccount = ref(true)
+    const unionId = ref(null)
     // 首先:默认认为已经注册且已经绑定
     // 通过QQ的API获取openId就是后台需要的unionId然后去进行登录
     // 如果成功:登录成功
     // 如果失败:改QQ未和小象进行绑定（有帐号未绑定QQ，没有帐号未绑定QQ)
     const isBind = ref(true)
-    // if (QC.Login.check()) { // 如果确保qq已经登陆
-    //   // 第三方唯一标识qq唯一标识
-    //   QC.Login.getMe((openId) => {
-    //     // 请求接口 做qq登录
-    //     userQQLogin(openId).then(res => {
-    //       // 代表：使用qq登录成功
-    //       // 1. 存储用户信息
-    //       const { id, account, avatar, mobile, nickname, token } = res.result
-    //       store.commit('user/setUser', { id, account, avatar, mobile, nickname, token })
-    //       // 2. 跳转到来源页或者首页
-    //       router.push(store.state.user.redirectUrl)
-    //       // 3. 成功提示
-    //       Message({ type: 'success', text: 'QQ登录成功' })
-    //     }).catch(() => {
-    //       // 代表：使用qq登录失败===>1. 没绑定小象帐号  2. 没有小象帐号
-    //       isBind.value = false
-    //     })
-    //   })
-    // }
+    if (QC.Login.check()) { // 如果确保qq已经登陆
+      // 第三方唯一标识qq唯一标识
+      QC.Login.getMe((openId) => {
+        unionId.value = openId
+        // 请求接口 做qq登录
+        userQQLogin(openId).then(res => {
+          // 代表：使用qq登录成功，有小象账号也绑定过
+          // 1. 存储用户信息
+          const { id, account, avatar, mobile, nickname, token } = res.result
+          store.commit('user/setUser', { id, account, avatar, mobile, nickname, token })
+          // 2. 跳转到来源页或者首页
+          router.push(store.state.user.redirectUrl)
+          // 3. 成功提示
+          Message({ type: 'success', text: 'QQ登录成功' })
+        }).catch(() => {
+          // 代表：使用qq登录失败===>1. 没绑定小象帐号  2. 没有小象帐号，也没绑定过
+          isBind.value = false
+          // unionId.value = openId
+        })
+      })
+    }
 
     const nickname = ref(null)
     const avatar = ref(null)
-    return { hasAccount, nickname, avatar, isBind }
+    return { hasAccount, nickname, avatar, isBind, unionId }
   }
 }
 </script>

@@ -58,7 +58,7 @@ export default {
         item.values.forEach(bv => { bv.selected = false })
         val.selected = true
       }
-      // #点击按钮时:更新按钮禁用状态
+      // #点击规格里按钮时:更新按钮禁用状态
       updateDisabledStatus(props.goods.specs, pathMap)
       //   将选择的sku规格信息 通知父组件(原价,现价,库存,属性值文字)
       // 每点一个按钮都会触发

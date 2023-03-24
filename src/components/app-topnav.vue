@@ -8,6 +8,7 @@
                     <li>
                         <a href="javascript:;"><i class="iconfont icon-user"></i>{{ profile.account  }}</a>
                     </li>
+                    <li @click="handleUnBindMobile"><a href="javascript:;">点击解绑电话号</a></li>
                     <li><a @click="logout" href="javascript:;">退出登录</a></li>
                 </template>
                 <!-- 未登录 -->
@@ -31,6 +32,8 @@
 import { computed } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
+import { unBindMobile } from '@/api/user'
+import Message from '@/components/library/Message'
 export default {
   setup () {
     const store = useStore()
@@ -45,7 +48,17 @@ export default {
       store.commit('user/setUser', {})
       router.push('/login')
     }
-    return { profile, logout }
+    // (登录并且是绑定状态) 点击解绑
+    const handleUnBindMobile = () => {
+      unBindMobile(profile.value.mobile).then(res => {
+        console.log(res)
+        Message({ type: 'success', text: '解绑成功' })
+      }).catch(err => {
+        console.log(err)
+        Message({ type: 'error', text: '解绑失败' })
+      })
+    }
+    return { profile, logout, handleUnBindMobile }
   }
 }
 </script>
