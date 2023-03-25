@@ -55,6 +55,11 @@ export default {
           updateGoods[key] = goods[key]// goods里传哪些字段就改哪些字段
         }
       }
+    },
+    // 删除购物车商品
+    deleteCart (state, skuId) {
+      const index = state.list.findIndex(item => item.skuId === skuId)
+      state.list.splice(index, 1)
     }
   },
   actions: {
@@ -89,7 +94,6 @@ export default {
             return getNewCartGoods(goods.skuId)
           })
           Promise.all(promiseArr).then(dataList => {
-            console.log(dataList, '111')
             // 遍历得到的所有商品更新本地购物车
             dataList.forEach((data, index) => {
               // console.log(data)//data.result里没有skuId，我们自己加上，因为他必须传
@@ -100,6 +104,47 @@ export default {
             // 调用resolve代表操作成功
             resolve()
           })
+        }
+      })
+    },
+    // 删除购物车商品
+    deleteCart (context, payload) {
+      // 单条删除payload是skuId
+      return new Promise((resolve, reject) => {
+        if (context.rootState.user.profile.token) {
+          // 登录
+        } else {
+          // 未登录（本地）
+          context.commit('deleteCart', payload)
+          resolve()
+        }
+      })
+    },
+    // 修改购物车（选中状态，数量）
+    updateCart (context, payload) {
+      // payload 需要：必须有skuId，可能有：selected  count
+      return new Promise((resolve, reject) => {
+        if (context.rootState.user.profile.token) {
+          // 登录
+        } else {
+          // 未登录（本地）
+          context.commit('updateCart', payload)
+          resolve()
+        }
+      })
+    },
+    // 做有效商品的全选&反选
+    checkAllCart (context, selected) {
+      return new Promise((resolve, reject) => {
+        if (context.rootState.user.profile.token) {
+          // 登录
+        } else {
+          // 未登录（本地）
+          // 1. 获取有效的商品列表，遍历的去调用修改mutations即可
+          context.getters.validList.forEach(item => {
+            context.commit('updateCart', { skuId: item.skuId, selected })
+          })
+          resolve()
         }
       })
     }
@@ -120,6 +165,28 @@ export default {
     validAmount (state, getters) {
       // 为了保证价格的精度，所以*100，因为一般钱数都是.00两位
       return getters.validList.reduce((p, c) => p + c.nowPrice * 100 * c.count, 0) / 100
+    },
+    // -------购物车页
+    // 无效商品列表(库存0,isEffective为false)
+    inValidList (state) {
+      return state.list.filter(item => !(item.stock > 0 && item.isEffective))
+    },
+    // 选中商品列表
+    selectedList (state, getters) {
+      return getters.validList.filter(item => item.selected)
+    },
+    // 选中商品件数
+    selectedTotal (state, getters) {
+      return getters.selectedList.reduce((p, c) => p + c.count, 0)
+    },
+    // 选中商品总金额
+    selectedAmount  (state, getters) {
+      return getters.selectedList.reduce((p, c) => p + (c.nowPrice * 100 * c.count), 0) / 100
+    },
+    // 是否全选
+    // 有效列表长度=选中列表长度
+    isCheckAll (state, getters) {
+      return getters.validList.length === getters.selectedList.length && getters.selectedList.length !== 0
     }
   }
 }

@@ -10,6 +10,7 @@
 import defaultImg from '@/assets/images/200.png'// 引入默认图片
 
 import Message from './Message' // 引入消息提示信息
+import Confirm from './Confirm' // 引入确认框
 // 导入library文件夹下的所有组件
 // 批量导入需要使用一个函数 require.context(dir,deep,matching)
 // 参数：1. 目录  2. 是否加载子目录  3. 加载的正则匹配
@@ -36,7 +37,8 @@ export default {
     // ----------------------------------------
     defineDirective(app)// 自定义全局指令
     // 如果你想挂载全局的属性，能够通过组件实例调用的属性   this.$message
-    app.config.globalProperties.$message = Message// 原型函数
+    app.config.globalProperties.$message = Message// 原型函数,提示信息
+    app.config.globalProperties.$confirm = Confirm// 原型函数,确认框
   }
 }
 

@@ -2,14 +2,14 @@
 <template>
     <div class="cart">
         <!-- 角标 数量 -->
-        <a class="curr" href="javascript:;">
+        <router-link class="curr" href="javascript:;"  to="/cart">
             <i class="iconfont icon-cart"></i><em>{{ $store.getters['cart/validTotal'] }}</em>
-        </a>
-        <div class="layer">
+        </router-link>
+        <div class="layer" v-if="$store.getters['cart/validTotal']>0&&$route.path!=='/cart'">
             <div class="list">
                 <!-- 每一项 -->
                 <div class="item" v-for="good in $store.getters['cart/validList']" :key="good.skuId">
-                    <RouterLink to="">
+                    <RouterLink :to="`/product/${good.id}`">
                         <img :src="good.picture" alt="">
                         <div class="center">
                             <p class="name ellipsis-2">{{ good.name }}</p>
@@ -20,7 +20,8 @@
                             <p class="count">x{{ good.count }}</p>
                         </div>
                     </RouterLink>
-                    <i class="iconfont icon-close-new"></i>
+                    <!-- 删除 -->
+                    <i @click="deleteCart(good.skuId)" class="iconfont icon-close-new"></i>
                 </div>
             </div>
             <div class="foot">
@@ -28,7 +29,7 @@
                     <p>共 {{ $store.getters['cart/validTotal'] }} 件商品</p>
                     <p>&yen;{{ $store.getters['cart/validAmount'] }}</p>
                 </div>
-                <XtxButton type="plain">去购物车结算</XtxButton>
+                <XtxButton type="plain" @click="$router.push('/cart')">去购物车结算</XtxButton>
             </div>
         </div>
     </div>
@@ -45,6 +46,15 @@ export default {
     store.dispatch('cart/getNewCart').then(() => {
       Message({ type: 'success', text: '更新购物车成功' })
     })
+    // 点击删除
+    const deleteCart = (skuId) => {
+      store.dispatch('cart/deleteCart', skuId).then(() => {
+        Message({ type: 'success', text: '删除成功' })
+      }).catch(e => {
+        Message({ type: 'error', text: '删除失败' })
+      })
+    }
+    return { deleteCart }
   }
 }
 </script>

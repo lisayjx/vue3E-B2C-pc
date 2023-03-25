@@ -8,6 +8,7 @@ const SubCategory = () => import('@/views/category/sub')
 const Goods = () => import('@/views/goods/index')
 const Login = () => import('@/views/login/index')
 const LoginCallback = () => import('@/views/login/callback')
+const Cart = () => import('@/views/cart')
 
 // 路由规则
 const routes = [
@@ -30,7 +31,12 @@ const routes = [
       {
         path: '/product/:id', // 商品详情页
         component: Goods
+      },
+      {
+        path: '/cart', // 购物车页
+        component: Cart
       }
+
     ]
   },
   // 登录页
@@ -41,6 +47,7 @@ const routes = [
   {
     path: '/login/callback', component: LoginCallback
   }
+
 ]
 // vue2.0 new VueRouter()创建路由实例
 // vue3.0 createRouter()创建路由实例
