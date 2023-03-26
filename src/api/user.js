@@ -86,3 +86,23 @@ export const userQQPatchLogin = ({ unionId, mobile, code, account, password }) =
 export const unBindMobile = (mobile) => {
   return request('/login/social/unbind', 'get', { mobile })
 }
+/**
+ *  注册
+ * @param {String} account - 帐号
+ * @param {String} mobile - 手机号
+ * @param {String} code - 验证码
+ * @param {String} password - 密码
+ * @param {type} type - PC端默认不传此值，app必传且值为app
+ * @returns Promise
+ */
+export const register = ({ account, mobile, code, password }) => {
+  return request('/register', 'post', { account, mobile, code, password })
+}
+/**
+ * 获取短信验证码-注册-PC
+ * @param {String} mobile - 手机号
+ * @returns Promise
+ */
+export const getRegisterCodePc = (mobile) => {
+  return request('/register/code', 'get', { mobile })
+}

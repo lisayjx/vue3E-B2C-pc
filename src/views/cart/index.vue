@@ -30,8 +30,8 @@
                     <RouterLink :to="`/product/${validGoods.id}`"><img :src="validGoods.picture" alt=""></RouterLink>
                     <div>
                       <p class="name ellipsis">{{validGoods.name  }}</p>
-                      <!-- 选择规格组件 -->
-                      <p class="attr">{{validGoods.attrsText}}</p>
+                     <!-- 选择规格组件 -->
+                    <CartSku @change="$event=>updateCartSku(validGoods.skuId,$event)" :attrsText="validGoods.attrsText" :skuId="validGoods.skuId"/>
                     </div>
                   </div>
                 </td>
@@ -40,7 +40,8 @@
                   <p v-if="validGoods.price-validGoods.nowPrice>0">比加入时降价 <span class="red">&yen;{{  validGoods.price-validGoods.nowPrice}}</span></p>
                 </td>
                 <td class="tc">
-                  <B2cNumbox :modelValue="validGoods.count"/>
+                  <!-- 数量 -->
+                  <B2cNumbox @change="$event=>updateCount(validGoods.skuId,$event)" :max="validGoods.stock" :modelValue="validGoods.count"/>
                 </td>
                 <td class="tc"><p class="f16 red">&yen;{{ Math.round(validGoods.nowPrice*100)*validGoods.count/100 }}</p></td>
                 <td class="tc">
@@ -92,9 +93,9 @@
         <div class="action">
           <div class="batch">
             <B2cCheckbox @change="checkAll" :modelValue="$store.getters['cart/isCheckAll']">全选</B2cCheckbox>
-            <a @click="deleteCartCheck" href="javascript:;">删除商品</a>
+            <a @click="batchDeleteCart()" href="javascript:;">删除商品</a>
             <a href="javascript:;">移入收藏夹</a>
-            <a href="javascript:;">清空失效商品</a>
+            <a  @click="batchDeleteCart(true)" href="javascript:;">清空失效商品</a>
           </div>
           <div class="total">
             共 {{$store.getters['cart/validTotal']}} 件商品，已选择 {{$store.getters['cart/selectedTotal']}} 件，商品合计：
@@ -114,10 +115,11 @@ import { useStore } from 'vuex'
 import CartNone from './components/cart-none.vue'
 import Message from '@/components/library/Message'
 import Confirm from '@/components/library/Confirm'
+import CartSku from './components/cart-sku'
 
 export default {
   name: 'B2cCartPage',
-  components: { GoodRelevant, CartNone },
+  components: { GoodRelevant, CartNone, CartSku },
   setup () {
     // 单选
     const store = useStore()
@@ -128,7 +130,7 @@ export default {
     const checkAll = (selected) => {
       store.dispatch('cart/checkAllCart', selected)
     }
-    // 直接在右侧点击删除
+    // 删除
     const deleteCart = (skuId) => {
       Confirm({ title: '提示信息', text: '您确定要删除此商品吗？' }).then(ok => {
         // 点击确定
@@ -140,23 +142,30 @@ export default {
         console.log('cancel')
       })
     }
-    // 勾选，下面点击删除
-    const deleteCartCheck = () => {
-      Confirm({ title: '提示信息', text: '您确定要删除此商品吗？' }).then(ok => {
+    // 勾选，批量删除（也支持清空无效商品传来true就是清空无效商品）
+    // isClear为true删除无效商品列表，如果没传就是删除选中的
+    const batchDeleteCart = (isClear) => {
+      Confirm({ title: '提示信息', text: `您确定要删除${isClear ? '失效' : '选中'}的商品吗？` }).then(ok => {
         // 点击确定
-        // 如果在下面点击删除商品，只能看现在选中了谁
-        const selectedList = store.getters['cart/selectedList']
-        selectedList.forEach(item => {
-          store.dispatch('cart/deleteCart', item.skuId)
-        })
-        Message({ type: 'success', text: '删除成功' })
+        store.dispatch('cart/batchDeleteCart', isClear)// 告诉vuex是否是清无效的
+        Message({ type: 'success', text: `${isClear ? '清空' : '删除'}成功` })
       }).catch(cancel => {
         // 点击取消
         console.log('cancel')
       })
     }
 
-    return { checkOne, checkAll, deleteCart, deleteCartCheck }
+    // 修改数量
+    const updateCount = (skuId, count) => {
+      store.dispatch('cart/updateCart', { skuId, count })
+    }
+    // 更新规格 购物车的sku
+    const updateCartSku = (oldSkuId, newSku) => {
+      // oldSkuId是老的购物车skuId
+      // newSku是 currSku，是子组件car-sku传来的新的sku数据，但是信息是5个属性，缺少 后续还要从老的购物车商品信息中合并
+      store.dispatch('cart/updateCartSku', { oldSkuId, newSku })
+    }
+    return { checkOne, checkAll, deleteCart, batchDeleteCart, updateCount, updateCartSku }
   }
 }
 </script>

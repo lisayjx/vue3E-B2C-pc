@@ -43,9 +43,10 @@ export default {
       return store.state.user.profile
     })
 
-    // 退出登录1.清空vuex和本次存储2.跳转
+    // 退出登录1.清空vuex和本地存储，本地购物车2.跳转
     const logout = () => {
       store.commit('user/setUser', {})
+      store.commit('cart/setCart', [])
       router.push('/login')
     }
     // (登录并且是绑定状态) 点击解绑

@@ -60,9 +60,12 @@ export default {
           // 1. 存储用户信息
           const { id, account, avatar, mobile, nickname, token } = res.result
           store.commit('user/setUser', { id, account, avatar, mobile, nickname, token })
+          store.dispatch('cart/mergeLocalCart').then(() => {
           // 2. 跳转到来源页或者首页
-          router.push(store.state.user.redirectUrl)
-          // 3. 成功提示
+            router.push(store.state.user.redirectUrl)
+            // 3. 成功提示
+            Message({ type: 'success', text: 'QQ登录成功' })
+          })
           Message({ type: 'success', text: 'QQ登录成功' })
         }).catch(() => {
           // 代表：使用qq登录失败===>1. 没绑定小象帐号  2. 没有小象帐号，也没绑定过

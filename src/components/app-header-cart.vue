@@ -29,7 +29,7 @@
                     <p>共 {{ $store.getters['cart/validTotal'] }} 件商品</p>
                     <p>&yen;{{ $store.getters['cart/validAmount'] }}</p>
                 </div>
-                <XtxButton type="plain" @click="$router.push('/cart')">去购物车结算</XtxButton>
+                <B2cButton type="plain" @click="$router.push('/cart')">去购物车结算</B2cButton>
             </div>
         </div>
     </div>

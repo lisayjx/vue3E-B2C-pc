@@ -37,7 +37,7 @@ import { userQQBindCode, userQQBindLogin } from '@/api/user'
 import Message from '@/components/library/Message'
 import { useIntervalFn } from '@vueuse/core'
 import { useStore } from 'vuex'
-import { useRoute, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 export default {
   name: 'CallbackBind',
   components: { Form, Field },
@@ -50,7 +50,6 @@ export default {
   },
   setup (props) {
     const store = useStore()
-    const route = useRoute()
     const router = useRouter()
     // qq登录：已注册，未绑定
     // 1. 准备下信息：unionId(openId) qq头像 昵称
@@ -122,10 +121,13 @@ export default {
           const { id, account, nickname, avatar, token, mobile } = res.result
           // 1.存储信息
           store.commit('user/setUser', { id, account, nickname, avatar, token, mobile })
-          // // 2.提示
-          Message({ type: 'success', text: 'qq绑定成功' })
-          // // 3.跳转
-          router.push(route.query.redirectUrl || '/')
+          // 合并购物车操作
+          store.dispatch('cart/mergeLocalCart').then(() => {
+            // 2. 提示
+            Message({ type: 'success', text: '绑定成功' })
+            // 3. 跳转
+            router.push(store.state.user.redirectUrl || '/')
+          })
         }).catch(err => {
           Message({ type: 'error', text: err.response.data.message || '绑定失败' })
         })

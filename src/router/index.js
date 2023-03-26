@@ -9,7 +9,7 @@ const Goods = () => import('@/views/goods/index')
 const Login = () => import('@/views/login/index')
 const LoginCallback = () => import('@/views/login/callback')
 const Cart = () => import('@/views/cart')
-
+const Register = () => import('@/views/login/register')
 // 路由规则
 const routes = [
   { // 一级路由布局容器
@@ -46,6 +46,10 @@ const routes = [
   // qq登陆后回跳的页
   {
     path: '/login/callback', component: LoginCallback
+  },
+  // 注册页
+  {
+    path: '/register', component: Register
   }
 
 ]

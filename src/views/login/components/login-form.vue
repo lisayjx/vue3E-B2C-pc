@@ -10,7 +10,7 @@
     </div>
     <!-- 表单校验,Field的name为了校验 -->
     <!-- autocomplete="off"原生表单的,是否开启填充,比如用户名下面一堆提示 -->
-    <Form ref="target" class="form" :validation-schema="mySchema" v-slot="{ errors }" autocomplete="off">
+    <Form ref="target" class="form" :validation-schema="mySchema" v-slot="{ errors }"  >
       <template v-if="!isMsgLogin">
         <div class="form-item">
           <div class="input">
@@ -87,7 +87,7 @@
       </a>
       <div class="url">
         <a href="javascript:;">忘记密码</a>
-        <a href="javascript:;">免费注册</a>
+        <router-link to="/register"  href="javascript:;">免费注册</router-link>
       </div>
     </div>
   </div>
@@ -197,10 +197,13 @@ export default {
             token,
             mobile
           })
-          // // 2.提示
-          Message({ type: 'success', text: '登录成功' })
-          // // 3.跳转
-          router.push(route.query.redirectUrl || '/')
+          // 合并购物车操作
+          store.dispatch('cart/mergeLocalCart').then(() => {
+          // 2. 提示
+            Message({ type: 'success', text: '登录成功' })
+            // 3. 跳转
+            router.push(route.query.redirectUrl || '/')
+          })
         } catch (error) {
           if (error) {
             Message({
