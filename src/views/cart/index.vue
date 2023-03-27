@@ -100,7 +100,7 @@
           <div class="total">
             共 {{$store.getters['cart/validTotal']}} 件商品，已选择 {{$store.getters['cart/selectedTotal']}} 件，商品合计：
           <span class="red">¥{{$store.getters['cart/selectedAmount']}}</span>
-            <B2cButton type="primary">下单结算</B2cButton>
+            <B2cButton @click="checkout" type="primary">下单结算</B2cButton>
           </div>
         </div>
         <!-- 猜你喜欢 -->
@@ -116,6 +116,7 @@ import CartNone from './components/cart-none.vue'
 import Message from '@/components/library/Message'
 import Confirm from '@/components/library/Confirm'
 import CartSku from './components/cart-sku'
+import { useRouter } from 'vue-router'
 
 export default {
   name: 'B2cCartPage',
@@ -165,7 +166,20 @@ export default {
       // newSku是 currSku，是子组件car-sku传来的新的sku数据，但是信息是5个属性，缺少 后续还要从老的购物车商品信息中合并
       store.dispatch('cart/updateCartSku', { oldSkuId, newSku })
     }
-    return { checkOne, checkAll, deleteCart, batchDeleteCart, updateCount, updateCartSku }
+    // 下单结算
+    const router = useRouter()
+    const checkout = () => {
+      // 1.提示至少选中一件商品
+      // 2.弹出确认框，是否需要去结算
+      // 3.跳转到结算页面（需要做路由守卫）
+      if (store.getters['cart/selectedList'].length === 0) {
+        return Message({ text: '至少选中一样商品' })
+      }
+      Confirm({ text: '下单结算需要登陆，是否去结算？' }).then(res => {
+        router.push('/member/checkout')
+      }).catch(e => console.log(e))
+    }
+    return { checkOne, checkAll, deleteCart, batchDeleteCart, updateCount, updateCartSku, checkout }
   }
 }
 </script>
