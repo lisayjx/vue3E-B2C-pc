@@ -44,15 +44,15 @@
           <!-- 配送时间 -->
           <h3 class="box-title">配送时间</h3>
           <div class="box-body">
-            <a class="my-btn active" href="javascript:;">不限送货时间：周一至周日</a>
-            <a class="my-btn" href="javascript:;">工作日送货：周一至周五</a>
-            <a class="my-btn" href="javascript:;">双休日、假日送货：周六至周日</a>
+            <a class="my-btn" :class="{active:currDeliveryTimeType===1}" @click="currDeliveryTimeType=1" href="javascript:;">不限送货时间：周一至周日</a>
+            <a class="my-btn" :class="{active:currDeliveryTimeType===2}" @click="currDeliveryTimeType=2" href="javascript:;">工作日送货：周一至周五</a>
+            <a class="my-btn" :class="{active:currDeliveryTimeType===3}" @click="currDeliveryTimeType=3" href="javascript:;">双休日、假日送货：周六至周日</a>
           </div>
           <!-- 支付方式 -->
            <h3 class="box-title">支付方式</h3>
           <div class="box-body">
-            <a class="my-btn active" href="javascript:;">在线支付</a>
-            <a class="my-btn" href="javascript:;">货到付款</a>
+            <a class="my-btn" :class="{active:payType===1}" @click="payType=1" href="javascript:;">在线支付</a>
+            <a class="my-btn" :class="{active:payType===2}" @click="payType=2" href="javascript:;">货到付款</a>
             <span style="color:#999">货到付款需付5元手续费</span>
           </div>
           <!-- 金额明细 -->
@@ -67,7 +67,7 @@
           </div>
           <!-- 提交订单 -->
           <div class="submit">
-            <B2cButton type="primary">提交订单</B2cButton>
+            <B2cButton @click="HandleSubmitOrder" type="primary">提交订单</B2cButton>
           </div>
         </div>
       </div>
@@ -77,32 +77,60 @@
 
 import CheckoutAddress from './components/checkout-address.vue'
 import { ref, reactive } from 'vue'
-import { createOrder } from '@/api/order.js'
+import { createOrder, submitOrder } from '@/api/order.js'
+import Message from '@/components/library/Message'
+import { useRouter } from 'vue-router'
 export default {
   name: 'B2cPayCheckoutPage',
   components: { CheckoutAddress },
   setup () {
+    const currDeliveryTimeType = ref(1)// 当前点击的配送时间 1为不限，2为工作日，3为双休或假日
+    const payType = ref(1)// 当前点击支付方式 1为在线支付，2为货到付款
+
     // 结算功能-生成订单-订单信息
     const order = ref(null)
     createOrder().then(res => {
       //   console.log(res.result) goods:[{},{}..] ,summary：{}，userAddresses：[]
       order.value = res.result
+      //   把商品每一项设置成 提交表单时候 需要的数据格式
+      reqParams.goods = order.value.goods.map(item => {
+        return {
+          skuId: item.skuId,
+          count: item.count
+        }
+      })
     })
 
-    // 切换收货地址-----------
+    // 切换收货地址
     // 1.组件初始化的时候需要得到一个默认的地址ID通知给结算组件
     // 2.对话框中渲染一个地址列表
     // 3.实现可以选中的效果，点击确认后变更显示地址，通知结算组件地址ID
 
     //    需要提交到后端的字段
     const reqParams = reactive({
-      addressId: null
+      addressId: null,
+      deliveryTimeType: 1, // 配送时间类型，1为不限，2为工作日，3为双休或假日
+      payType: 1, // 支付方式，1为在线支付，2为货到付款
+      buyerMessage: '', // 买家留言
+      goods: []// 在上面获取数据时候设置了需要穿给后端的数据格式
     })
     // 收到子组件在此页面初始化 时候 和修改选中时候传来的地址id
     const changeAddress = (addressId) => {
       reqParams.addressId = addressId
     }
-    return { createOrder, order, changeAddress }
+
+    // 提交订单
+    const router = useRouter()
+    const HandleSubmitOrder = () => {
+      if (!reqParams.addressId) return Message({ text: '请选择收货地址' })
+      submitOrder(reqParams).then(res => {
+        // 返回来的数据： 订单id，payType支付方式，payChannel支付渠道
+        // 跳转到支付页
+        router.push({ path: '/member/pay', query: { id: res.result.id } })
+      })
+    }
+
+    return { createOrder, order, changeAddress, HandleSubmitOrder, currDeliveryTimeType, payType }
   }
 }
 </script>

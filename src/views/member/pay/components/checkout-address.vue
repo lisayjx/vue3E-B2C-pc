@@ -1,4 +1,5 @@
 <template>
+    <!-- 添加/修改都在这个组件 -->
     <div class="checkout-address">
         <div class="text">
             <div v-if="!showAddress" class="none">您需要先添加收货地址才可提交订单。</div>
@@ -7,24 +8,21 @@
                 <li><span>联系方式：</span>{{ showAddress.contact.replace(/^(\d{3})\d{4}(\d{4})/, '$1****$2') }}</li>
                 <li><span>收货地址：</span>{{ showAddress.fullLocation.replace(/ /g, '') + showAddress.address }}</li>
             </ul>
-            <a href="javascript:;" @click="visibleDialog=true">修改地址</a>
+            <a href="javascript:;" @click="editAddress(showAddress)">修改地址</a>
         </div>
         <div class="action">
             <B2cButton v-if="showAddress" class="btn" @click="openDialog">切换地址</B2cButton>
-            <B2cButton class="btn" @click="visibleDialog=true">添加地址</B2cButton>
+            <B2cButton class="btn" @click="openAddressEdit({})">添加地址</B2cButton>
         </div>
 
     </div>
 
-         <!-- 添加地址弹窗 组件 -->
+    <!-- 添加地址弹窗 组件 -->
     <!-- vue3.0 仅支持v-slot+template/#写法 -->
     <B2cDialog title="切换收货地址" v-model:visible="visibleDialog">
         <!-- 默认插槽 -->
-        <div class="text item"
-        :class="{active:selectedAddress&&selectedAddress.id===item.id}"
-        @click="selectedAddress=item"
-         v-for="item in userAddresses"
-          :key="item.id">
+        <div class="text item" :class="{ active: selectedAddress && selectedAddress.id === item.id }" @click="selectedAddress = item"
+            v-for="item in userAddresses" :key="item.id">
             <ul>
                 <li><span>收<i />货<i />人：</span>{{ item.receiver }}</li>
                 <li><span>联系方式：</span>{{ item.contact.replace(/^(\d{3})\d{4}(\d{4})/, '$1****$2') }}</li>
@@ -38,11 +36,16 @@
         </template>
     </B2cDialog>
 
+    <!-- 添加地址 弹窗组件 -->
+    <AddressEdit @on-success="successAddAddress" ref="addressEdit"/>
+
 </template>
 <script>
 import { ref } from 'vue'
+import AddressEdit from './address-edit.vue'
 export default {
   name: 'CheckoutAddress',
+  components: { AddressEdit },
   props: {
     userAddresses: {
       type: Array,
@@ -94,7 +97,41 @@ export default {
       selectedAddress.value = null// 为了防止你下一次打开时候有上次选中的地方
       visibleDialog.value = true
     }
-    return { showAddress, visibleDialog, selectedAddress, confirmAddress, openDialog }
+    // 打开添加地址
+    const addressEdit = ref(null)
+    const openAddressEdit = () => {
+      // 调用edit组件里的open方法
+      addressEdit.value.open({})
+    }
+    // 在子组件edit的弹窗里 成功（添加/修改）地址后
+
+    // 更新地址数据（修改/添加 接口）成功后
+    const successAddAddress = (formData) => { // formData是子组件传来的地址数据
+      // 根据formData中的ID去当前地址列表中查找，有就是修改，否则是添加
+    //   因为是要更新之前的数据，所以要找到之前的数据，通过id找
+      // 1.修改     editAddress修改的那项地址
+      const editAddress = props.userAddresses.find(item => item.id === formData.id)
+      if (editAddress) { // 如果找到了那条需要修改的信息
+        for (const key in editAddress) {
+          // eslint-disable-next-line vue/no-mutating-props
+          editAddress[key] = formData[key]// 更新了数据列表里的对象信息
+          //   把formData 赋值给你找到的那个editAddress信息
+        }
+      } else {
+        // 2.如果是添加 就往userAddresses里追加
+      //   当你在修改formData的时候，数组中的数据也会更新，因为是同一引用地址。
+      //   啥时候修改formData，当你打开对话框需要清空之前的输入信息
+        const json = JSON.stringify(formData) // 需要克隆下，不然使用的是对象的引用，防止以后重新打开弹窗清空数据会没
+        // eslint-disable-next-line vue/no-mutating-props
+        props.userAddresses.unshift(JSON.parse(json))// 代码没问题，但是他是props数据 会提示
+      }
+    }
+    // 点击修改地址
+    const editAddress = (showAddress) => {
+      // 调用edit组件里的open方法 打开弹窗，同时传人当前需要修改的地址对象showAddress
+      addressEdit.value.open(showAddress)// showAddress就是当前显示在页面的地址
+    }
+    return { showAddress, visibleDialog, selectedAddress, confirmAddress, openDialog, openAddressEdit, addressEdit, successAddAddress, editAddress }
   }
 }
 </script>
@@ -165,26 +202,31 @@ export default {
 
 // 对话框
 .b2c-dialog {
-  .text {//每一个
-    flex: 1;
-    min-height: 90px;
-    display: flex;
-    align-items: center;
-    &.item {
-      border: 1px solid #f5f5f5;
-      margin-bottom: 10px;
-      cursor: pointer;
-      &.active,&:hover {
-        border-color: @b2cColor;
-        // background: lighten(@b2cColor,50%);//使用 lighten() 和 darken() 函数来修改 50% 的亮度值
-background: #f0ded1;
-      }
-      > ul {
-        padding: 10px;
-        font-size: 14px;
-        line-height: 30px;
-      }
+    .text {
+        //每一个
+        flex: 1;
+        min-height: 90px;
+        display: flex;
+        align-items: center;
+
+        &.item {
+            border: 1px solid #f5f5f5;
+            margin-bottom: 10px;
+            cursor: pointer;
+
+            &.active,
+            &:hover {
+                border-color: @b2cColor;
+                // background: lighten(@b2cColor,50%);//使用 lighten() 和 darken() 函数来修改 50% 的亮度值
+                background: #f0ded1;
+            }
+
+            >ul {
+                padding: 10px;
+                font-size: 14px;
+                line-height: 30px;
+            }
+        }
     }
-  }
 }
 </style>

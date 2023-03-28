@@ -1,11 +1,10 @@
 <template>
     <div class="b2c-city" ref="target">
       <div class="select" @click="toggleDialog" :class="{active:visible}">
-        <!-- 如果没有值 就占位 -->
-        <span v-if="fullLocation" class="placeholder">{{ fullLocation}}</span>
-        <span v-else class="placeholder">请选择配送地址</span>
         <!-- 如果有值,显示在这里 -->
-        <span class="value"></span>
+        <span v-if="fullLocation" class="value">{{ fullLocation}}</span>
+         <!--如果没有值 就占位  -->
+        <span v-else class="placeholder">{{ placeholder}}</span>
         <i class="iconfont icon-angle-down"></i>
       </div>
       <div class="option" v-show="visible">
@@ -26,6 +25,10 @@ export default {
     fullLocation: {
       type: String,
       default: ''
+    },
+    placeholder: {
+      type: String,
+      default: '请选择配送地址'
     }
   },
   setup (props, { emit }) {

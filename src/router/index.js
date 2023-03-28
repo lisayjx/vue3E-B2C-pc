@@ -11,6 +11,7 @@ const LoginCallback = () => import('@/views/login/callback')
 const Cart = () => import('@/views/cart')
 const Register = () => import('@/views/login/register')
 const PayCheckout = () => import('@/views/member/pay/checkout')
+const PayIndex = () => import('@/views/member/pay/index')
 // 路由规则
 // /member开头的都是需要登陆的
 const routes = [
@@ -41,7 +42,8 @@ const routes = [
       {
         path: '/member/checkout', // 需要登陆后才能跳转到的结算页面
         component: PayCheckout
-      }
+      },
+      { path: '/member/pay', component: PayIndex }// 支付
 
     ]
   },
