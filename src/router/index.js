@@ -12,6 +12,10 @@ const Cart = () => import('@/views/cart')
 const Register = () => import('@/views/login/register')
 const PayCheckout = () => import('@/views/member/pay/checkout')
 const PayIndex = () => import('@/views/member/pay/index')
+const PayResult = () => import('@/views/member/pay/result')
+
+const MemberLayout = () => import('@/views/member/Layout')
+const MemberHome = () => import('@/views/member/home')
 // 路由规则
 // /member开头的都是需要登陆的
 const routes = [
@@ -43,8 +47,8 @@ const routes = [
         path: '/member/checkout', // 需要登陆后才能跳转到的结算页面
         component: PayCheckout
       },
-      { path: '/member/pay', component: PayIndex }// 支付
-
+      { path: '/member/pay', component: PayIndex }, // 支付
+      { path: '/pay/callback', component: PayResult }// 支付结果,后端返回的地址就是/pay/callback
     ]
   },
   // 登录页
@@ -58,6 +62,15 @@ const routes = [
   // 注册页
   {
     path: '/register', component: Register
+  },
+  // 个人中心布局页
+  {
+    path: '/member',
+    component: MemberLayout,
+    children: [
+      // 个人中心页
+      { path: '/member', component: MemberHome }
+    ]
   }
 
 ]

@@ -8,15 +8,16 @@
           <B2cBreadItem>支付订单</B2cBreadItem>
         </B2cBread>
         <!-- 付款信息 -->
-        <div class="pay-info">
+        <div class="pay-info" v-if="order">
           <span class="icon iconfont icon-queren2"></span>
           <div class="tip">
             <p>订单提交成功！请尽快完成支付。</p>
-            <p>支付还剩 <span>24分59秒</span>, 超时后将取消订单</p>
+          <p v-if="order.countdown > -1">支付还剩 <span>{{timeText}}</span>, 超时后将取消订单</p>
+          <p v-else>订单已经超时</p>
           </div>
           <div class="amount">
             <span>应付总额：</span>
-            <span>¥5673.00</span>
+            <span>¥{{order.payMoney}}</span>
           </div>
         </div>
         <!-- 付款方式 -->
@@ -24,8 +25,8 @@
           <p class="head">选择以下支付方式付款</p>
           <div class="item">
             <p>支付平台</p>
-            <a class="btn wx" href="javascript:;"></a>
-            <a class="btn alipay" href="javascript:;"></a>
+            <a class="btn wx" href="javascript:;" :class="{active:payChannel===1}" @click="payChannel=1"></a>
+            <a class="btn alipay" @click="openPayLoad"  :href="payUrl" target="_blank" :class="{active:payChannel===2}" ></a>
           </div>
           <div class="item">
             <p>支付方式</p>
@@ -37,11 +38,57 @@
           </div>
         </div>
       </div>
+      <!-- 支付提示对话框 -->
+      <B2cDialog title="正在支付..." v-model:visible="visible">
+      <div class="pay-wait">
+        <img src="@/assets/images/load1.gif" alt="">
+        <div v-if="order">
+            <p>如果支付成功：</p>
+            <RouterLink :to="`/member/order/${$route.query.id}`">查看订单详情></RouterLink>
+            <p>如果支付失败：</p>
+            <RouterLink to="/">查看相关疑问</RouterLink>
+        </div>
+      </div>
+    </B2cDialog>
     </div>
   </template>
 <script>
+import { ref } from 'vue'
+import { findOrder } from '@/api/order'
+import { useRoute } from 'vue-router'
+import { usePayTime } from '@/hooks'
+import { baseURL } from '@/utils/request'
+
 export default {
-  name: 'B2cPayPage'
+  name: 'B2cPayPage',
+  setup () {
+    const route = useRoute()
+    const order = ref(null) // 订单
+    const payChannel = ref(2) // 支付渠道，1支付宝、2微信
+    // 查询订单详情
+    findOrder(route.query.id).then(data => {
+      // 设置订单
+      order.value = data.result
+      // 拿到数据 倒计时开始
+      // 后端提供 countdown 倒计时秒数
+      if (data.result.countdown > -1) {
+        start(data.result.countdown)
+      }
+    })
+    const { start, timeText } = usePayTime()
+    // 支付地址
+    // const payUrl = '后台服务基准地址+支付页面地址+订单ID+回跳地址'
+    const redirect = encodeURIComponent('http://www.corho.com:8080/#/pay/callback')// 回跳地址
+    const payUrl = `${baseURL}pay/aliPay?orderId=${route.query.id}&redirect=${redirect}`
+
+    // 支付提示加载
+    const openPayLoad = () => {
+      visible.value = true
+      order.value.payChannel = 2
+    }
+    const visible = ref(false)
+    return { order, start, timeText, payChannel, payUrl, visible, openPayLoad }
+  }
 }
 </script>
   <style scoped lang="less">
@@ -116,4 +163,16 @@ export default {
       }
     }
   }
+  .pay-wait {
+  display: flex;
+  justify-content: space-around;
+
+  p {
+    margin-top: 30px;
+    font-size: 14px;
+  }
+  a {
+    color: @b2cColor;
+  }
+}
   </style>

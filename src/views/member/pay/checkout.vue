@@ -93,7 +93,7 @@ export default {
       //   console.log(res.result) goods:[{},{}..] ,summary：{}，userAddresses：[]
       order.value = res.result
       //   把商品每一项设置成 提交表单时候 需要的数据格式
-      reqParams.goods = order.value.goods.map(item => {
+      reqParams.goods = res.result.goods.map(item => {
         return {
           skuId: item.skuId,
           count: item.count
@@ -108,11 +108,11 @@ export default {
 
     //    需要提交到后端的字段
     const reqParams = reactive({
-      addressId: null,
+      addressId: null, // 收货地址，切换收货地址或者组件默认的时候设置
       deliveryTimeType: 1, // 配送时间类型，1为不限，2为工作日，3为双休或假日
       payType: 1, // 支付方式，1为在线支付，2为货到付款
       buyerMessage: '', // 买家留言
-      goods: []// 在上面获取数据时候设置了需要穿给后端的数据格式
+      goods: []// 商品信息，在上面获取数据时候设置了需要传给后端的数据格式
     })
     // 收到子组件在此页面初始化 时候 和修改选中时候传来的地址id
     const changeAddress = (addressId) => {
