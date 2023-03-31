@@ -42,6 +42,7 @@ export default {
       default: 10
     }
   },
+  emits: ['CurrentChange'],
   setup (props, { emit }) {
     // 准备数据
     // 评论总条数

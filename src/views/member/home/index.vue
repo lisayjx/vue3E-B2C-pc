@@ -9,7 +9,7 @@
       </HomePanel>
       <!-- 足迹 -->
       <HomePanel title="我的足迹">
-        <GoodsItem v-for="i in 4" :key="i" :good="good" />
+        <GoodsItem v-for="item in collectGoods" :key="item.id" :good="item" />
       </HomePanel>
       <!-- 猜你 -->
       <GoodsRelevant />
@@ -36,7 +36,7 @@ export default {
     const collectGoods = ref(null)
     getCollect({ page: 1, pageSize: 4 }).then(data => {
       collectGoods.value = data.items
-      console.log(data)
+      console.log(data.items)
     })
     return { collectGoods }
   }

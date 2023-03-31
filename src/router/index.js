@@ -3,6 +3,7 @@ import store from '@/store'
 // 懒加载引入路由
 import Layout from '@/views/Layout'
 import Home from '@/views/home'
+import { h } from 'vue' // 创建标签
 const TopCategory = () => import('@/views/category')
 const SubCategory = () => import('@/views/category/sub')
 const Goods = () => import('@/views/goods/index')
@@ -16,12 +17,15 @@ const PayResult = () => import('@/views/member/pay/result')
 
 const MemberLayout = () => import('@/views/member/Layout')
 const MemberHome = () => import('@/views/member/home')
+const MemberOrder = () => import('@/views/member/order/index.vue')
+const MemberOrderDetail = () => import('@/views/member/order/detail.vue')
+
 // 路由规则
 // /member开头的都是需要登陆的
 const routes = [
   { // 一级路由布局容器
     path: '/',
-    component: Layout,
+    component: Layout, // 上面导航条和下面footer布局
     children: [
       {
         path: '/',
@@ -48,7 +52,26 @@ const routes = [
         component: PayCheckout
       },
       { path: '/member/pay', component: PayIndex }, // 支付
-      { path: '/pay/callback', component: PayResult }// 支付结果,后端返回的地址就是/pay/callback
+      { path: '/pay/callback', component: PayResult }, // 支付结果,后端返回的地址就是/pay/callback
+      // 个人中心布局页(他需要 上面导航条布局)
+      {
+        path: '/member',
+        component: MemberLayout, // （左侧菜单布局）
+        children: [
+          { path: '/member', component: MemberHome }, // 个人中心页
+          // { path: '/member/order', component: MemberOrder }, // 个人中心-我的订单
+          // { path: '/member/order/:id', component: MemberOrderDetail }// 个人中心-我的订单-详情页
+          {
+            // vue3.0 需要有嵌套关系才能模糊匹配
+            path: '/member/order', // 改造我的订单的路由
+            component: { render: () => h(<RouterView/>) }, // 创建RouterView标签
+            children: [
+              { path: '', component: MemberOrder }, // 我的订单页 /member/order
+              { path: ':id', component: MemberOrderDetail }// 我的订单详情页 /member/order/:id
+            ]
+          }
+        ]
+      }
     ]
   },
   // 登录页
@@ -62,15 +85,6 @@ const routes = [
   // 注册页
   {
     path: '/register', component: Register
-  },
-  // 个人中心布局页
-  {
-    path: '/member',
-    component: MemberLayout,
-    children: [
-      // 个人中心页
-      { path: '/member', component: MemberHome }
-    ]
   }
 
 ]

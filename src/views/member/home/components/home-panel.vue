@@ -2,7 +2,7 @@
     <div class="home-panel">
       <div class="header">
         <h4>{{ title }}</h4>
-        <XtxMore to="/" />
+        <B2cMore to="/" />
       </div>
       <!-- 商品列表 -->
       <div class="goods-list">
