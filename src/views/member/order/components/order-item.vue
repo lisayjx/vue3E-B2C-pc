@@ -9,13 +9,13 @@
             <b v-if="order.orderState===1">付款截止：{{ timeText}}</b>
           </span>
           <!-- 已完成 已取消 显示删除,includes表示5或者6中有没有后面的状态 有任何一个就true -->
-           <a v-if="[5,6].includes(order.orderState)" href="javascript:;">删除</a>
+          <a @click="$emit('on-delete-order',order)" v-if="[5,6].includes(order.orderState)" href="javascript:;" class="del">删除</a>
         </div>
         <div class="body">
           <div class="column goods">
             <ul>
               <li v-for="goods in order.skus" :key="goods.id">
-                <router-link class="image" :to="`/product/${goods.id}`">
+                <router-link class="image" :to="`/product/${goods.spuId}`">
                   <img :src="goods.image" alt="" />
                 </router-link>
                 <div class="info">
@@ -35,7 +35,7 @@
             <!-- 待收货-查看物流 -->
             <!-- 待评价-评价商品 -->
             <!-- 已完成-查看评价 -->
-            <p v-if="order.orderState===3"><a href="javascript:;" class="green">查看物流</a></p>
+            <p v-if="order.orderState===3" @click="$emit('on-logistics',order)"><a href="javascript:;" class="green">查看物流</a></p>
             <p v-if="order.orderState===4"><a href="javascript:;" class="green">评价商品</a></p>
             <p v-if="order.orderState===5"><a href="javascript:;" class="green">查看评价</a></p>
           </div>
@@ -49,14 +49,15 @@
         <!-- 2待发货：查看详情，再次购买 -->
         <!-- 3待收货：确认收货，查看详情，再次购买 -->
         <!-- 4待评价：查看详情，再次购买，申请售后 -->
-        <!-- 5已完成：查看详情，再次购买，申请售后 -->
-        <!-- 6已取消：查看详情 -->
+        <!-- 5已完成：查看详情，再次购买，申请售后,删除订单 -->
+        <!-- 6已取消：查看详情,删除订单 -->
             <B2cButton @click="$router.push(`/member/pay?orderId=${order.id}`)" v-if="order.orderState===1" type="primary" size="small">立即付款</B2cButton>
-            <B2cButton v-if="order.orderState===3" type="primary" size="small">确认收货</B2cButton>
-            <p ><a href="javascript:;">查看详情</a></p>
-            <p v-if="order.orderState===1"><a href="javascript:;">取消订单</a></p>
+            <B2cButton v-if="order.orderState===3" @click="$emit('on-confirm-order',order)" type="primary" size="small">确认收货</B2cButton>
+            <p ><a @click="$router.push(`/member/order/${order.id}`)" href="javascript:;">查看详情</a></p>
+            <p v-if="order.orderState===1" @click="$emit('on-cancel',order)"><a  href="javascript:;">取消订单</a></p>
             <p v-if="[2,3,4,5].includes(order.orderState)"><a href="javascript:;">再次购买</a></p>
             <p v-if="[4,5].includes(order.orderState)"><a href="javascript:;">申请售后</a></p>
+
           </div>
         </div>
       </div>
@@ -83,10 +84,13 @@ export default {
       default: () => {}
     }
   },
+  emits: ['on-cancel', 'on-delete-order', 'on-confirm-order', 'on-logistics'], // 发送给 index
   setup (props) {
     // 倒计时 工具
     const { start, timeText } = usePayTime()
     start(props.order.countdown)
+    // 删除订单
+
     return { orderStatus, timeText }
   }
 }
