@@ -1,0 +1,4 @@
+1、svg文件可用使用Adobe Illustrator打开编辑。
+2、svg文件为矢量图文件，如果压缩包中的png和jpg图片的尺寸不能满足您的要求，可以使用Adobe Illustrator 导出ai文件导出任意尺寸的高清图。
+3、svg文件可以用Adobe Illustrator 导出ai文件。
+4、如果您需要编辑源文件，安装压缩包中的字体后，用Adobe Illustrator编辑即可。

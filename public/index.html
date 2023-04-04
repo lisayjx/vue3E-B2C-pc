@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
+    <!-- 字体图标里巴巴图标库里的，需要有网络 -->
+    <link rel="stylesheet" href="//at.alicdn.com/t/font_2143783_iq6z4ey5vu.css">
+    <title><%= htmlWebpackPlugin.options.title %></title>
+  </head>
+  <body>
+    <noscript>
+      <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+    </noscript>
+    <div id="app"></div>
+    <div id="model"></div>
+    <!-- built files will be auto injected -->
+    <!--引入QCjs文件 -->
+    <!-- 用于qq登录，后面地址 看你端口是啥 可以改 -->
+    <!-- 引入这个js文件后，在全局就有一个QC，就相当于jquery里的$ -->
+    <!-- 用它创建qq登录按钮 -->
+    <script type="text/javascript"  charset="utf-8"
+    src="http://connect.qq.com/qc_jssdk.js" data-appid="100556005" data-redirecturi="http://www.corho.com:8080/#/login/callback"></script>
+  <!-- http://www.corho.com:8080/ -->
+  </body>
+</html>
